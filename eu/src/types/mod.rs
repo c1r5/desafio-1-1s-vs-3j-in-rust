@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::RwLock};
+use std::sync::RwLock;
 
 use serde::{Deserialize, Serialize};
 
@@ -42,5 +42,5 @@ pub trait UserClient {
 impl UserClient for UserDB {
     fn new() -> Self {
         RwLock::new(Vec::new())
-    } 
+    }
 }

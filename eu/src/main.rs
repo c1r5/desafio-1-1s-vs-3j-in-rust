@@ -3,19 +3,17 @@ mod types;
 
 use types::{UserClient, UserDB};
 
-#[macro_use] extern crate rocket;
-
+#[macro_use]
+extern crate rocket;
 
 #[launch]
 async fn rocket() -> _ {
-
-    rocket::build()
-    .manage::<UserDB>(UserClient::new())
-    .mount(
-        "/", 
+    rocket::build().manage::<UserDB>(UserClient::new()).mount(
+        "/",
         routes![
             controllers::index,
-            controllers::users::upload_users
-        ]
-)
+            controllers::users::upload_users,
+            controllers::users::get_superusers
+        ],
+    )
 }
