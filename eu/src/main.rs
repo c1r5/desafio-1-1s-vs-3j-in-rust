@@ -1,7 +1,7 @@
+use types::{UserClient, UserDB};
+
 mod controllers;
 mod types;
-
-use types::{UserClient, UserDB};
 
 #[macro_use]
 extern crate rocket;
@@ -13,7 +13,8 @@ async fn rocket() -> _ {
         routes![
             controllers::index,
             controllers::users::upload_users,
-            controllers::users::get_superusers
+            controllers::users::get_superusers,
+            controllers::users::get_topcountries
         ],
     )
 }

@@ -47,9 +47,9 @@ pub struct UserFilter {
 }
 
 #[derive(serde::Serialize)]
-struct SearchResponse {
-    results: Vec<Usuario>,
-    elapsed: u128,
+struct SearchResponse<T> {
+    results: Vec<T>,
+    elapsed: f64,
 }
 
 #[get("/superusers?<filter..>")]
@@ -70,7 +70,35 @@ pub async fn get_superusers(filter: UserFilter, db: &State<UserDB>) -> String {
 
     let response = SearchResponse {
         results: superusers,
-        elapsed: now.elapsed().as_nanos(),
+        elapsed: now.elapsed().as_secs_f64(),
+    };
+
+    serde_json::to_string(&response).unwrap_or_else(|_| "Failed to serialize response".to_string())
+}
+
+#[get("/top-countries")]
+pub async fn get_topcountries(db: &State<UserDB>) -> String {
+    let db_read = db.read().unwrap();
+
+    let now = Instant::now();
+
+    let superusers: Vec<Usuario> = db_read
+        .iter()
+        .filter(|user| user.score >= 100 && user.active)
+        .cloned()
+        .collect();
+
+    let top_countries =
+        superusers
+            .iter()
+            .fold(std::collections::HashMap::new(), |mut acc, user| {
+                *acc.entry(user.country.clone()).or_insert(0) += 1;
+                acc
+            });
+
+    let response = SearchResponse {
+        results: top_countries.into_iter().collect(),
+        elapsed: now.elapsed().as_secs_f64(),
     };
 
     serde_json::to_string(&response).unwrap_or_else(|_| "Failed to serialize response".to_string())
